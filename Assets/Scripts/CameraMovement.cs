@@ -38,7 +38,8 @@ public class CameraMovement: MonoBehaviour
 
         if (target != null)
         {
-            transform.position = AnimMath.Ease(transform.position, target.position, .01f);
+            transform.position = AnimMath.Ease(transform.position, target.position, .001f);
+            transform.position = target.position;
         }
     }
 }

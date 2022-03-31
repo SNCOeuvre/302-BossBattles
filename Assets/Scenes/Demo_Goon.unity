@@ -962,8 +962,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 701472904459081420, guid: 8f3d537e63516c34da5be23a9d34b570,
         type: 3}
+      propertyPath: jumpImpulse
+      value: 5.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 701472904459081420, guid: 8f3d537e63516c34da5be23a9d34b570,
+        type: 3}
       propertyPath: walkFootSpeed
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 701472904459081420, guid: 8f3d537e63516c34da5be23a9d34b570,
+        type: 3}
+      propertyPath: footSeperateAmount
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3490759721216116506, guid: 8f3d537e63516c34da5be23a9d34b570,
         type: 3}
@@ -1024,6 +1034,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Goon
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943264248756872369, guid: 8f3d537e63516c34da5be23a9d34b570,
+        type: 3}
+      propertyPath: m_SkinWidth
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6940820781372377459, guid: 8f3d537e63516c34da5be23a9d34b570,
+        type: 3}
+      propertyPath: m_Weight
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f3d537e63516c34da5be23a9d34b570, type: 3}

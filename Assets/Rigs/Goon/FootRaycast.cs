@@ -31,11 +31,15 @@ public class FootRaycast : MonoBehaviour
     /// </summary>
     private Vector3 targetPosition;
 
+    private Vector3 footSeperateDir;
+
     void Start()
     {
         startingRotation = transform.localRotation;
         //sets it to wherever the foot is in the local position in the scene
         startingPosition = transform.localPosition;
+
+        footSeperateDir = (startingPosition.x > 0) ? Vector3.right : Vector3.left;
     }
 
     
@@ -57,9 +61,9 @@ public class FootRaycast : MonoBehaviour
         targetPosition = startingPosition;
     }
 
-    public void SetPositionOffset(Vector3 p)
+    public void SetPositionOffset(Vector3 p, float seperateAmount = 0)
     {
-        targetPosition = startingPosition + p; 
+        targetPosition = startingPosition + p + seperateAmount * footSeperateDir; 
     }
 
     private void FindGround()
