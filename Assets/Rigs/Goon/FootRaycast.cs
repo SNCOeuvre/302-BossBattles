@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class FootRaycast : MonoBehaviour
 {
+    /// <summary>
+    /// The local space position of where the IK spawned
+    /// </summary>
+    private Vector3 startingPosition;
 
-    //length of the raycast
+    
+    // length of the raycast in meters
     public float raycastLength = 2;
-    private float distanceBetweenGroundAndIK = 0;
-    private Quaternion startingRot;
+    /// <summary>
+    /// The local space rotation of where the IK spawned
+    /// </summary>
+    private Quaternion startingRotation;
 
     /// <summary>
     /// The world-space position of the ground above/below the foot IK.
@@ -19,20 +26,40 @@ public class FootRaycast : MonoBehaviour
     /// </summary>
     private Quaternion groundRotation;
 
-
+    /// <summary>
+    /// The local space position to ease towards. This allows us to animate the position!
+    /// </summary>
+    private Vector3 targetPosition;
 
     void Start()
     {
-        startingRot = transform.localRotation;
+        startingRotation = transform.localRotation;
         //sets it to wherever the foot is in the local position in the scene
-        distanceBetweenGroundAndIK = transform.localPosition.y;
+        startingPosition = transform.localPosition;
     }
 
     
     void Update()
     {
-        FindGround();
+        //FindGround();
 
+        //ease towards target
+        transform.localPosition = AnimMath.Ease(transform.localPosition, targetPosition, .01f);
+    }
+
+    public void SetPositionLocal(Vector3 p)
+    {
+        targetPosition = p;
+    }
+
+    public void SetPositionHome()
+    {
+        targetPosition = startingPosition;
+    }
+
+    public void SetPositionOffset(Vector3 p)
+    {
+        targetPosition = startingPosition + p; 
     }
 
     private void FindGround()
@@ -50,10 +77,10 @@ public class FootRaycast : MonoBehaviour
         {
 
             //finds ground position
-            groundPosition = hitInfo.point + Vector3.up * distanceBetweenGroundAndIK;
+            groundPosition = hitInfo.point + Vector3.up * startingPosition.y;
 
             //uses parent rotation times the starting local rotation | converts starting rotation into world-space
-            Quaternion worldNeutral = transform.parent.rotation * startingRot;
+            Quaternion worldNeutral = transform.parent.rotation * startingRotation;
 
             //rotation aligned with ground times the world rotation | finds ground rotation
             groundRotation = Quaternion.FromToRotation(Vector3.up, hitInfo.normal) * worldNeutral;

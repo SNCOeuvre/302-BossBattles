@@ -7,6 +7,13 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class GoonMovement : MonoBehaviour
 {
+
+    enum Mode
+    {
+        Idle,
+        Walk
+    }
+
     public FootRaycast footLeft;
     public FootRaycast footRight;
 
@@ -16,10 +23,15 @@ public class GoonMovement : MonoBehaviour
     public float walkSpreadZ = .8f;
     public float walkSpreadX = .2f;
     private CharacterController pawn;
+    private Mode mode = Mode.Idle;
+    private Vector3 input;
+    private float walkTime;
+    private Camera cam;
 
     void Start()
     {
-        pawn = GetComponent<CharacterController>();    
+        pawn = GetComponent<CharacterController>();
+        cam = Camera.main;
     }
 
     
@@ -28,20 +40,52 @@ public class GoonMovement : MonoBehaviour
         float v = Input.GetAxis("Vertical");
         float h = Input.GetAxis("Horizontal");
 
-        Vector3 move = transform.forward * v + transform.right * h;
+        //cam without the y
+        Vector3 camForward = cam.transform.forward;
+        camForward.y = 0;
+        camForward.Normalize();
 
-        if (move.sqrMagnitude > 1) move.Normalize();
+        //cam without the
+        Vector3 camSide = Vector3.Cross(Vector3.up, camForward);
 
+        input = camForward * v + camSide * h;
+
+        if (input.sqrMagnitude > 1) input.Normalize();
+
+        float threshold = .1f;
+        //set movement mode based on movement input using ternart statement
+        mode = (input.sqrMagnitude > threshold * threshold) ? Mode.Walk : Mode.Idle;
         //applies delta movement times public speed
-        pawn.SimpleMove(move * speed);
+        pawn.SimpleMove(input * speed);
 
         //animate feet?
-        AnimateWalk();
+        Animate();
 
     }
 
+    void Animate()
+    {
+        switch (mode)
+        {
+            case Mode.Idle:
+                AnimateIdle();
+                break;
+            case Mode.Walk:
+                AnimateWalk();
+                break;
+        }
+    }
+
     //makes a new green thing that can become a data type of
-    delegate void MoveFoot(float time, float x, FootRaycast foot);
+    delegate void MoveFoot(float time, FootRaycast foot);
+
+    void AnimateIdle()
+    {
+        footLeft.SetPositionHome();
+        footRight.SetPositionHome();
+        
+        
+    }
 
     void AnimateWalk()
     {
@@ -49,23 +93,31 @@ public class GoonMovement : MonoBehaviour
         //don't repeat yourself!
 
         //anon function
-        MoveFoot moveFoot = (t, x, foot) =>
+        MoveFoot moveFoot = (t, foot) =>
         {
             //floats for up and down and forward and back
-            float y = Mathf.Cos(t) * walkSpreadY;
-            float z = Mathf.Sin(t) * walkSpreadZ; //[-1, +1]
+            float y = Mathf.Cos(t) * walkSpreadY; //vertical movement
+            float lateral = Mathf.Sin(t) * walkSpreadZ; //[-1, +1] //lateral movement forward and back
+
+            //world space to local space; inverse is the key here
+            Vector3 localDir = foot.transform.parent.InverseTransformDirection(input);
+
+            float x = lateral * localDir.x;
+            float z = lateral * localDir.z;
 
             if (y < 0) y = 0;
             //adds offset
-            y += .177f;
+            //y += .177f;
 
-            foot.transform.localPosition = new Vector3(x, y, z);
+            foot.SetPositionOffset(new Vector3(x, y, z));
         };
 
-        float t = Time.time * walkFootSpeed;
+        walkTime += Time.deltaTime * input.sqrMagnitude * walkFootSpeed;
 
-        moveFoot.Invoke(t,-walkSpreadX, footLeft);
-        moveFoot.Invoke(t+ Mathf.PI, walkSpreadX, footRight);
+        
+
+        moveFoot.Invoke(walkTime, footLeft);
+        moveFoot.Invoke(walkTime + Mathf.PI, footRight);
     }
 
 
