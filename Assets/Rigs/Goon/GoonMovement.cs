@@ -115,7 +115,13 @@ public class GoonMovement : MonoBehaviour
 
     void AnimateJump()
     {
+        //todo:
 
+        //lift legs
+        //lift hands
+        //air drift
+        //spikes move
+        //use vertical velocity
     }
 
 
